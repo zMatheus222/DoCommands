@@ -1,5 +1,5 @@
-#ifndef DOCOMMANDS_HPP
-#define DOCOMMANDS_HPP
+#ifndef DOCOMMANDS_H
+#define DOCOMMANDS_H
 
 #include <iostream>
 #include <string>
@@ -56,4 +56,4 @@ private:
 	static bool show_logs;
 };
 
-#endif // DOCOMMANDS_HPP
+#endif
