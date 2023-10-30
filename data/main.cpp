@@ -74,8 +74,9 @@ vector<vector<string>> CommandScheduler::definir_esquema(){
 
 	vector<vector<string>> all_commands(50);
 
-	//ifstream arquivo_yml("commands.yml"); //redhat
-	ifstream arquivo_yml(pwd_executavel() + "/commands.yml"); //ubuntu
+	string yml_file_path = pwd_executavel() + "/configs/commands.yml";
+	
+	ifstream arquivo_yml(yml_file_path); //ubuntu
 	
 	if (!arquivo_yml.is_open()) {
 		cout << "falha ao carregar o arquivo .yml, verifique se o mesmo existe." << endl;
@@ -161,7 +162,7 @@ void CommandScheduler::pos_execucao(int& count_1, vector<vector<string>>& all_co
 
 	//log_wait("after clear, before ofstream log_file");
 
-	ofstream log_file(pwd_executavel() + "/commands.log", ios::app);
+	ofstream log_file(pwd_executavel() + "logs/commands.log", ios::app);
 	if (!log_file.is_open()) {
 		cout << "Arquivo commands.log não foi encontrado!.";
 		exit(0);
@@ -400,15 +401,25 @@ string CommandScheduler::pwd_executavel(){
 	
 	ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
 	char* dir_name;
+	string to_return;
 	if (count != -1) {
 		result[count] = '\0';
 
 		// Extrai o diretório pai do caminho absoluto
 		dir_name = dirname(result);
-		cout << "Pasta raiz do executável: " << dir_name << std::endl;
+		
+		// Agora, extraia o diretório pai
+        char* parent_dir_name = dirname(dir_name);
+
+        // Converta o caminho para uma string
+        string parent_directory(parent_dir_name);
+		
+		to_return = parent_directory;
+		
+		cout << "Pasta raiz do serviço docommands: " << parent_directory << endl;
 	}
 	
-	return dir_name;
+	return to_return;
 }
 
 void CommandScheduler::inicializador() {
@@ -418,15 +429,27 @@ void CommandScheduler::inicializador() {
 		limpar_tela();
 
 		cout << "Do Command v0.1\n" << endl;
-		cout << "Iniciando..." << endl;
+		cout << "Iniciando..." << endl << endl;
 		
 		wait_ms(1500);
+		
+		int resp;
+		do { 
+		
+			cout << "O que deseja fazer?" << endl;
+			cout << "1-Executar docommands" << endl;
+			cout << "2-Realizar adição ou reomoção de comandos com vim" << endl;
+			cout << "3-Checar fila de comandos em espera\n> ";
+			
+			cin >> resp;
+			
+			vector<vector<string>> all_commands;
+			vector<string> time_data;
 
-		vector<vector<string>> all_commands;
-		vector<string> time_data;
-
-		all_commands = definir_esquema();
-		executar_comandos(all_commands);
+			all_commands = definir_esquema();
+			executar_comandos(all_commands);
+		
+		} while(resp != 1 && resp != 2 && resp != 3);
 	}
 	
 }
